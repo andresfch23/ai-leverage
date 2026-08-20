@@ -1,0 +1,42 @@
+[
+  {
+    "id": "case-01",
+    "type": "clear-positive",
+    "description": "Variable 'total' declared twice (useState and const) — does not compile",
+    "input_code": "function CartTotal({ items }: { items: CartItem[] }) {\n  const [total, setTotal] = useState(0);\n\n  const total = items.reduce((sum, item) => sum + item.price, 0);\n\n  return <span>{total}</span>;\n}",
+    "expected": {
+      "should_flag": true,
+      "severity": "critical",
+      "category": "bug"
+    }
+  },
+  {
+    "id": "case-02",
+    "type": "negative",
+    "description": "Correct debounce hook: complete dependencies, timer cleanup",
+    "input_code": "function useDebounce<T>(value: T, delayMs: number): T {\n  const [debounced, setDebounced] = useState(value);\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebounced(value), delayMs);\n    return () => clearTimeout(timer);\n  }, [value, delayMs]);\n\n  return debounced;\n}",
+    "expected": {
+      "should_flag": false
+    }
+  },
+  {
+    "id": "case-03",
+    "type": "false-positive-trap",
+    "description": "Looks suspicious (does not exclude 0), but it's intentional and documented in a comment",
+    "input_code": "function getDiscountLabel(discount: number | undefined): string {\n  if (discount === undefined || discount === null) {\n    return \"No discount\";\n  }\n  // Note: 0 is a valid discount (e.g. a coupon that cancels a previous discount)\n  // that's why it is NOT treated as \"no discount\"\n  return `${discount}% off`;\n}",
+    "expected": {
+      "should_flag": false
+    }
+  },
+  {
+    "id": "case-04",
+    "type": "subtle-positive",
+    "description": "insuranceCost can come as undefined and is not validated — risk of NaN, not obvious at first glance",
+    "input_code": "function ShippingCost({ order }: { order: Order }) {\n  const cost = order.baseCost + order.insuranceCost;\n  return <span>${cost.toFixed(2)}</span>;\n}",
+    "expected": {
+      "should_flag": true,
+      "severity": "high",
+      "category": "bug"
+    }
+  }
+]
